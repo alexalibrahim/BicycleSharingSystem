@@ -3,7 +3,7 @@
 <html>
 <head>
 
-	<style type="text/css">
+    <style type="text/css">
       html, body, #basicMap {
           height: 600px;  /* The height is 400 pixels */
         width: 100%;
@@ -16,75 +16,71 @@
    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
    crossorigin=""></script>
     <script >
-    class Station {
-        constructor(name,capacity,av_bikes,av_docks,lat,long,time){
-            this.name = name
-            this.capacity = capacity
-            this.av_bikes = av_bikes
-            this.av_docks = av_docks
-            this.lat = lat
-            this.long = long
-            this.time = time
-        }
+    function Station(name,capacity,av_bikes,av_docks,lat,long,time){
+        this.name = name
+        this.capacity = capacity
+        this.av_bikes = av_bikes
+        this.av_docks = av_docks
+        this.lat = lat
+        this.long = long
+        this.time = time
     }
     var mymap;
     var showMap = true
     var stations = []
     function init() {
-    	
-    	mymap = L.map('basicMap');
- 	 	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-		maxZoom: 18,
-		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-		id: 'mapbox.streets'
-		}).addTo(mymap);
-		loadMarkers();
+        
+        mymap = L.map('basicMap');
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+            '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+            'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        id: 'mapbox.streets'
+        }).addTo(mymap);
+        loadMarkers();
     }
 
     function LoadStations() {
 
-    	var xhttp = new XMLHttpRequest();
-    	xhttp.onreadystatechange = function() {
-    		if (this.readyState == 4 && this.status == 200) {
-    			var obj = JSON.parse(this.responseText);
-    			var results = obj.results;
-    			var bindings = results.bindings;
-    			var str = '';
-    			for (var i = 0; i < bindings.length; i++) {
-    				var obj = bindings[i];
-    				var lat_obj = obj['lat'];
-    				var lon_obj = obj['lon'];
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var obj = JSON.parse(this.responseText);
+                var results = obj.results;
+                var bindings = results.bindings;
+                for (var obj of bindings) {
+                    var lat_obj = obj['lat'];
+                    var lon_obj = obj['lon'];
 
-    				var lat_value = lat_obj.value;
-    				var lon_value = lon_obj.value;
-    				var capacity = obj['capacity'].value;
-    				var name = obj['name'].value;
-    				
-    				var av_bikes = obj['av_bikes'].value;
-    				var av_docks = obj['av_docks'].value;
-    				var unix_timestamp = obj['max_date'].value;
+                    var lat_value = lat_obj.value;
+                    var lon_value = lon_obj.value;
+                    var capacity = obj['capacity'].value;
+                    var name = obj['name'].value;
+                    
+                    var av_bikes = obj['av_bikes'].value;
+                    var av_docks = obj['av_docks'].value;
+                    var unix_timestamp = obj['max_date'].value;
 
-    				var seconds = parseInt(new Date().getTime() / 1000);
-    				var update_time = seconds - unix_timestamp;
+                    var seconds = Number.parseInt(Date.now() / 1000);
+                    var update_time = seconds - unix_timestamp;
 
                     stations.push(new Station(name,capacity,av_bikes,av_docks,lat_value,lon_value,update_time))
 
-    			}
+                }
                 init();
-    		}
-    	};
-    	var dynamicSelect = document.getElementById("dynamic_select");
+            }
+        };
+        var dynamicSelect = document.getElementById("dynamic_select");
 
-    	var selected_city = dynamicSelect[dynamicSelect.selectedIndex].value;
+        var selected_city = dynamicSelect[dynamicSelect.selectedIndex].value;
         
 
-    	xhttp.open("POST", "http://35.228.55.184:3030/test/query", true);
-    	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    	var query = "query=PREFIX wdt: <http://www.wikidata.org/prop/direct/> SELECT ?lat ?lon ?capacity ?name ?max_date ?av_bikes ?av_docks WHERE { ?station <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?lon ; <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?lat ; <http://www.w3.org/2000/01/rdf-schema#label> ?name ; wdt:P1083 ?capacity ; wdt:P276 <"+selected_city+">{ SELECT ?station (MAX(?date) AS ?max_date) (MAX(?availableBicycles) as ?av_bikes) (MAX(?availableDocks) as ?av_docks) WHERE { ?station <http://www.schema.org/State> ?state . ?state <http://www.example.org/time> ?date ; <http://www.example.org/availableBicycles> ?availableBicycles ; <http://www.example.org/availableDocks> ?availableDocks; } group by ?station } }";
+        xhttp.open("POST", "http://35.228.55.184:3030/test/query", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        var query = "query=PREFIX wdt: <http://www.wikidata.org/prop/direct/> SELECT ?lat ?lon ?capacity ?name ?max_date ?av_bikes ?av_docks WHERE { ?station <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?lon ; <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?lat ; <http://www.w3.org/2000/01/rdf-schema#label> ?name ; wdt:P1083 ?capacity ; wdt:P276 <"+selected_city+">{ SELECT ?station (MAX(?date) AS ?max_date) (MAX(?availableBicycles) as ?av_bikes) (MAX(?availableDocks) as ?av_docks) WHERE { ?station <http://www.schema.org/State> ?state . ?state <http://www.example.org/time> ?date ; <http://www.example.org/availableBicycles> ?availableBicycles ; <http://www.example.org/availableDocks> ?availableDocks; } group by ?station } }";
 
-    	xhttp.send(query);
+        xhttp.send(query);
 
     }
 
@@ -111,30 +107,30 @@
     function loadCities(){
     
     var dynamicSelect = document.getElementById("dynamic_select");
-   	var xhttp = new XMLHttpRequest();
+    var xhttp = new XMLHttpRequest();
 
-    	xhttp.onreadystatechange = function() {
-    		if (this.readyState == 4 && this.status == 200) {
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
 
-    			var obj = JSON.parse(this.responseText);
-    			var results = obj.results;
-    			var bindings = results.bindings;
-    			var str = '';
-    			for (var i = 0; i < bindings.length; i++) {
+                var obj = JSON.parse(this.responseText);
+                var results = obj.results;
+                var bindings = results.bindings;
+                var str = '';
+                for (var i = 0; i < bindings.length; i++) {
 
-    				var obj = bindings[i];
-    				var name = obj['name'].value;
-    				var uri = obj['city'].value;
+                    var obj = bindings[i];
+                    var name = obj['name'].value;
+                    var uri = obj['city'].value;
 
-    				dynamicSelect.innerHTML += "<option value=\""+uri+"\" >"+name+"</option>";
+                    dynamicSelect.innerHTML += "<option value=\""+uri+"\" >"+name+"</option>";
 
-    			}
+                }
                 LoadStations();
-    		}
-    	};
-    	xhttp.open("POST", "http://35.228.55.184:3030/test/query", true);
-    	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    	xhttp.send("query=select ?city ?name where {?city <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.wikidata.org/entity/Q515> . ?city <http://www.w3.org/2000/01/rdf-schema#label> ?name }");
+            }
+        };
+        xhttp.open("POST", "http://35.228.55.184:3030/test/query", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send("query=select ?city ?name where {?city <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.wikidata.org/entity/Q515> . ?city <http://www.w3.org/2000/01/rdf-schema#label> ?name }");
 
     }
 
@@ -230,23 +226,23 @@
         
     }
     </script>
-	<meta charset="UTF-8">
-	<title>Map</title>
-	<link rel="stylesheet" href="css/style.css" type="text/css">
-	<link rel="stylesheet" href="css/combo.css" type="text/css">
+    <meta charset="UTF-8">
+    <title>Map</title>
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <link rel="stylesheet" href="css/combo.css" type="text/css">
     <link rel="stylesheet" href="css/style_cards.css" type="text/css">
 </head>
 <body onload="loadCities()">
-	<div id="header">
-		<div class="wrapper clearfix">
-			<div id="logo">
-				<a href="index.html"><img src="images/logo.png" width="60" height="50"></a>
-			</div>
-			<ul id="navigation">
+    <div id="header">
+        <div class="wrapper clearfix">
+            <div id="logo">
+                <a href="index.html"><img src="images/logo.png" width="60" height="50"></a>
+            </div>
+            <ul id="navigation">
                 <li >
                     <a href="index.html">Home</a>
                 </li>
-				<li >
+                <li >
                     <a href="blog.html">Add Cities</a>
                 </li>
                 <li class="selected">
@@ -259,9 +255,9 @@
                 <li>
                     <a href="contact.html">Contact Us</a>
                 </li>
-			</ul>
-		</div>
-	</div>
+            </ul>
+        </div>
+    </div>
     <div id="contents">
         <div id="contact" class="wrapper clearfix">
             <div class="main">
@@ -269,16 +265,16 @@
             </div>
         </div>
     </div>
-	<div id="footer">
-		<div id="wrapper" class="wrapper clearfix">		
-			<h3>Choose city:</h3>
-			<select id="dynamic_select" onchange="LoadStations()" style="width:150px;height:30px;">
+    <div id="footer">
+        <div id="wrapper" class="wrapper clearfix">     
+            <h3>Choose city:</h3>
+            <select id="dynamic_select" onchange="LoadStations()" style="width:150px;height:30px;">
 
-			</select>
-			</br>
-			<p style="font-size:160%;">Click on the markers viewed on the map to check bicycle stations information</p>
-			</br>
-			<div id="sidebar">
+            </select>
+            </br>
+            <p style="font-size:160%;">Click on the markers viewed on the map to check bicycle stations information</p>
+            </br>
+            <div id="sidebar">
                 <a id="btn_show" href="#" class="outlinedbtn" onclick="switchListener()">SHOW LIST</a>
                 <br/>
                 <br/>
@@ -289,7 +285,7 @@
             </div>
             <br/>
 
-		</div>
+        </div>
         <div class="body">
             <div class="wrapper clearfix">
                 <div id="links">
@@ -338,14 +334,14 @@
             </div>
         </div>
 
-		
-	</div>
+        
+    </div>
 <!--     <div class="body">
         <div class="wrapper clearfix">
             
         </div>
     <div> -->
-	
+    
 
 </body>
 </html>
