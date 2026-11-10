@@ -3,7 +3,7 @@
 <html>
 <head>
 
-	<style type="text/css">
+    <style type="text/css">
       html, body, #basicMap {
           height: 600px;  /* The height is 400 pixels */
         width: 100%;
@@ -33,19 +33,19 @@
     mapAlreadyInit = false;
     function init() {
 
-    	if(document.getElementById('basicMap')){
-        	if(!mapAlreadyInit){
+        if(document.getElementById('basicMap')){
+            if(!mapAlreadyInit){
                 mymap = L.map('basicMap');
-         	 	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-        		maxZoom: 18,
-        		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-        			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-        			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        		id: 'mapbox.streets'
-        		}).addTo(mymap);
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                id: 'mapbox.streets'
+                }).addTo(mymap);
                 mapAlreadyInit = true;
             }
-    		loadMarkers();
+            loadMarkers();
         }
     }
 
@@ -63,22 +63,22 @@
     function LoadStations() {
 
         stations = []
-    	var xhttp = new XMLHttpRequest();
-    	xhttp.onreadystatechange = function() {
-    		if (this.readyState == 4 && this.status == 200) {
-    			var obj = JSON.parse(this.responseText);
-    			var results = obj.results;
-    			var bindings = results.bindings;
-    			var str = '';
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var obj = JSON.parse(this.responseText);
+                var results = obj.results;
+                var bindings = results.bindings;
+                var str = '';
                 var count = 0
-    			for (var i = 0; i < bindings.length; i++) {
+                for (var i = 0; i < bindings.length; i++) {
 
-    				var obj = bindings[i];
-    				var lat_obj = obj['lat'];
-    				var lon_obj = obj['lon'];
+                    var obj = bindings[i];
+                    var lat_obj = obj['lat'];
+                    var lon_obj = obj['lon'];
 
-    				var lat_value = lat_obj.value;
-    				var lon_value = lon_obj.value;
+                    var lat_value = lat_obj.value;
+                    var lon_value = lon_obj.value;
 
                     var name = obj['name'].value;
                     var av_bikes = obj['av_bikes'].value;
@@ -112,7 +112,7 @@
                         var bank_card = obj['bank_card'].value;
                         station.bank_card = bank_card
                     }
-    				if(obj.hasOwnProperty('last_time')){
+                    if(obj.hasOwnProperty('last_time')){
 
                         station.time = obj['last_time'].value;
 
@@ -120,18 +120,18 @@
                     
                     stations.push(station)
 
-    			}
+                }
                 init();
-    		}
-    	};
-    	var dynamicSelect = document.getElementById("dynamic_select");
+            }
+        };
+        var dynamicSelect = document.getElementById("dynamic_select");
 
 
-    	var selected_city = dynamicSelect[dynamicSelect.selectedIndex].value;
+        var selected_city = dynamicSelect[dynamicSelect.selectedIndex].value;
         
 
-    	xhttp.open("POST", "http://localhost:3030/test/query", true);
-    	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.open("POST", "http://localhost:3030/test/query", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         
         // change query ......
 
@@ -158,7 +158,7 @@
                 "      }\n" +
                 "   }";*/
 
-    	var query ="query=PREFIX wdt: <http://www.wikidata.org/prop/direct/> \n" +
+        var query ="query=PREFIX wdt: <http://www.wikidata.org/prop/direct/> \n" +
                 "SELECT ?station ?lat ?lon ?capacity ?bank_card ?name ?max_date ?av_bikes ?av_docks ?address ?last_time WHERE {\n" +
                 " ?station <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?lon ; \n" +
                 "       <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?lat ;\n" +
@@ -178,7 +178,7 @@
                 "     } group by ?station \n" +
                 "  } \n" +
                 "}";
-    	xhttp.send(query);
+        xhttp.send(query);
 
     }
 
@@ -222,32 +222,32 @@
    
     var dynamicSelect = document.getElementById("dynamic_select");
 
-   	var xhttp = new XMLHttpRequest();
+    var xhttp = new XMLHttpRequest();
 
-    	xhttp.onreadystatechange = function() {
-    		if (this.readyState == 4 && this.status == 200) {
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
 
-    			var obj = JSON.parse(this.responseText);
-    			var results = obj.results;
-    			var bindings = results.bindings;
-    			var str = '';
+                var obj = JSON.parse(this.responseText);
+                var results = obj.results;
+                var bindings = results.bindings;
+                var str = '';
 
-    			for (var i = 0; i < bindings.length; i++) {
+                for (var i = 0; i < bindings.length; i++) {
 
-    				var obj = bindings[i];
-    				var name = obj['name'].value;
-    				var uri = obj['city'].value;
+                    var obj = bindings[i];
+                    var name = obj['name'].value;
+                    var uri = obj['city'].value;
 
-    				dynamicSelect.innerHTML += "<option value=\""+uri+"\" >"+name+"</option>";
+                    dynamicSelect.innerHTML += "<option value=\""+uri+"\" >"+name+"</option>";
 
-    			}
+                }
                 LoadStations();
-    		}
-    	};
+            }
+        };
 
-    	xhttp.open("POST", "http://localhost:3030/test/query", true);
-    	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    	xhttp.send("query=select ?city ?name where {?city <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.wikidata.org/entity/Q515> . ?city <http://www.w3.org/2000/01/rdf-schema#label> ?name }");
+        xhttp.open("POST", "http://localhost:3030/test/query", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send("query=select ?city ?name where {?city <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.wikidata.org/entity/Q515> . ?city <http://www.w3.org/2000/01/rdf-schema#label> ?name }");
 
     }
 
@@ -358,23 +358,23 @@
         
     }
     </script>
-	<meta charset="UTF-8">
-	<title>Map</title>
-	<link rel="stylesheet" href="css/style.css" type="text/css">
-	<link rel="stylesheet" href="css/combo.css" type="text/css">
+    <meta charset="UTF-8">
+    <title>Map</title>
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <link rel="stylesheet" href="css/combo.css" type="text/css">
     <link rel="stylesheet" href="css/style_cards.css" type="text/css">
 </head>
 <body onload="loadCities()">
-	<div id="header">
-		<div class="wrapper clearfix">
-			<div id="logo">
-				<a href="index.html"><img src="images/logo.png" width="60" height="50"></a>
-			</div>
-			<ul id="navigation">
+    <div id="header">
+        <div class="wrapper clearfix">
+            <div id="logo">
+                <a href="index.html"><img src="images/logo.png" width="60" height="50"></a>
+            </div>
+            <ul id="navigation">
                 <li >
                     <a href="index.html">Home</a>
                 </li>
-				<li >
+                <li >
                     <a href="blog.html">Add Cities</a>
                 </li>
                 <li class="selected">
@@ -383,9 +383,9 @@
                 <li>
                     <a href="about.html">Statistics</a>
                 </li>
-			</ul>
-		</div>
-	</div>
+            </ul>
+        </div>
+    </div>
     <div id="contents">
         <div id="contact" class="wrapper clearfix">
             <div class="main">
@@ -393,14 +393,14 @@
             </div>
         </div>
     </div>
-	<div id="footer">
-		<div id="wrapper" class="wrapper clearfix">		
-			<h3>Choose city:</h3>
-			<select id="dynamic_select" onchange="LoadStations()" style="width:150px;height:30px;">
+    <div id="footer">
+        <div id="wrapper" class="wrapper clearfix">     
+            <h3>Choose city:</h3>
+            <select id="dynamic_select" onchange="LoadStations()" style="width:150px;height:30px;">
 
-			</select>
-			</br>
-			
+            </select>
+            </br>
+            
             
 
             <?php
@@ -434,25 +434,25 @@
                         echo '  <div class="card rounded shadowed">
                             <div class="card-content">
                             <div class="card-title">
-                                <h3 about="'.$value['station_uri'].'" property="http://www.w3.org/2000/01/rdf-schema#label" >'.$value['name'].'</h3>
+                                <h3 about="'.htmlspecialchars($value['station_uri'], ENT_QUOTES).'" property="http://www.w3.org/2000/01/rdf-schema#label" >'.htmlspecialchars($value['name'], ENT_QUOTES).'</h3>
                             <div class="card-description">
-                                <p about="'.$value['station_uri'].'" property="http://www.example.org/availableBicycles" content="'.$value['av_bikes'].'"><b>Available Bicycles: </b>'.$value['av_bikes'].'</p>
-                                <p about="'.$value['station_uri'].'" property="http://www.example.org/availableDocks" content="'.$value['av_docks'].'" ><b>Available Docks: </b>'.$value['av_docks'].'</p>
+                                <p about="'.htmlspecialchars($value['station_uri'], ENT_QUOTES).'" property="http://www.example.org/availableBicycles" content="'.htmlspecialchars($value['av_bikes'], ENT_QUOTES).'"><b>Available Bicycles: </b>'.htmlspecialchars($value['av_bikes'], ENT_QUOTES).'</p>
+                                <p about="'.htmlspecialchars($value['station_uri'], ENT_QUOTES).'" property="http://www.example.org/availableDocks" content="'.htmlspecialchars($value['av_docks'], ENT_QUOTES).'" ><b>Available Docks: </b>'.htmlspecialchars($value['av_docks'], ENT_QUOTES).'</p>
                                 ';
                         if(isset($value['capacity'])){
-                            echo '<p about="'.$value['station_uri'].'" property="http://www.wikidata.org/prop/direct/P1083" content="'.$value['capacity'].'" ><b>Capacity: </b>'.$value['capacity'].'</p>
+                            echo '<p about="'.htmlspecialchars($value['station_uri'], ENT_QUOTES).'" property="http://www.wikidata.org/prop/direct/P1083" content="'.htmlspecialchars($value['capacity'], ENT_QUOTES).'" ><b>Capacity: </b>'.htmlspecialchars($value['capacity'], ENT_QUOTES).'</p>
                             ';
                         }
                         if(isset($value['address'])){
-                            echo '<p about="'.$value['station_uri'].'" property="http://www.wikidata.org/prop/direct/P6375" content="'.$value['address'].'" ><b>Address: </b>'.$value['address'].'</p>
+                            echo '<p about="'.htmlspecialchars($value['station_uri'], ENT_QUOTES).'" property="http://www.wikidata.org/prop/direct/P6375" content="'.htmlspecialchars($value['address'], ENT_QUOTES).'" ><b>Address: </b>'.htmlspecialchars($value['address'], ENT_QUOTES).'</p>
                             ';
                         }
                         if(isset($value['bank_card'])){
-                            echo '<p about="'.$value['station_uri'].'" property="https://schema.org/PaymentCard" content="'.$value['bank_card'].'" ><b>Pay by card: </b>'.$value['bank_card'].'</p>
+                            echo '<p about="'.htmlspecialchars($value['station_uri'], ENT_QUOTES).'" property="https://schema.org/PaymentCard" content="'.htmlspecialchars($value['bank_card'], ENT_QUOTES).'" ><b>Pay by card: </b>'.htmlspecialchars($value['bank_card'], ENT_QUOTES).'</p>
                             ';
                         }
                         if(isset($value['time'])){
-                            echo '<p about="'.$value['station_uri'].'" property="http://purl.org/iot/vocab/m3-lite#Timestamp" content="'.$value['time'].'" ><b>Last reported: </b>'.$value['time'].'</p>
+                            echo '<p about="'.htmlspecialchars($value['station_uri'], ENT_QUOTES).'" property="http://purl.org/iot/vocab/m3-lite#Timestamp" content="'.htmlspecialchars($value['time'], ENT_QUOTES).'" ><b>Last reported: </b>'.htmlspecialchars($value['time'], ENT_QUOTES).'</p>
                             ';
                         }
 
@@ -468,7 +468,7 @@
             ?>
             <br/>
 
-		</div>
+        </div>
         <div class="body">
             <div class="wrapper clearfix">
                 <div id="links">
@@ -517,14 +517,14 @@
             </div>
         </div>
 
-		
-	</div>
+        
+    </div>
 <!--     <div class="body">
         <div class="wrapper clearfix">
             
         </div>
     <div> -->
-	
+    
 
 </body>
 </html>
